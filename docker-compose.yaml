@@ -4,11 +4,15 @@ services:
     build: .
     ports:
       - 8000:3000
-    volumes:  
+    volumes:
       - .:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run start:dev
     depends_on:
       - db
-
+    
   db:
     image: mysql:5.7.22
     restart: always
