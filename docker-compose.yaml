@@ -1,15 +1,14 @@
-version: '3.9'
 services:
   backend:
     build: .
     ports:
       - 8000:3000
     volumes:
-      - .:/app
-      - /app/node_modules
+      - .:/app:delegated
     environment:
       - CHOKIDAR_USEPOLLING=true
-    command: npm run start:dev
+    command: ["npm", "run", "start:dev"]
+
     depends_on:
       - db
     
