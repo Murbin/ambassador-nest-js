@@ -1,11 +1,17 @@
-import { BadRequestException, Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, NotFoundException, Post, Res } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcryptjs'
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+
 @Controller()
 export class AuthController {
 
-  constructor(private userService: UserService) { }
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) { }
 
   @Post('admin/register')
   async register(@Body() body: RegisterDto) {
@@ -29,10 +35,11 @@ export class AuthController {
   @Post('admin/login')
   async login(
     @Body('email') email: string,
-    @Body('password') password: string
+    @Body('password') password: string,
+    @Res({ passthrough: true }) response: Response
   ) {
     const user = await this.userService.findOne({ email })
-    console.log('ser', user?.password, password)
+
     if (!user) {
       throw new NotFoundException('User not found')
     }
@@ -43,6 +50,14 @@ export class AuthController {
       throw new BadRequestException('Invalid credential')
     }
 
-    return user
+    const jwt = await this.jwtService.signAsync({
+      id: user.id
+    })
+
+    response.cookie('jwt', jwt, { httpOnly: true })
+
+    return {
+      msg: 'succes'
+    }
   }
 }
