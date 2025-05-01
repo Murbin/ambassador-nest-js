@@ -40,7 +40,7 @@ export class AuthController {
     @Body('password') password: string,
     @Res({ passthrough: true }) response: Response
   ) {
-    const user = await this.userService.findOne({ email })
+    const user = await this.userService.findOne({ where: { email } })
 
     if (!user) {
       throw new NotFoundException('User not found')
@@ -74,7 +74,7 @@ export class AuthController {
       throw new UnauthorizedException()
     }
 
-    const user = await this.userService.findOne({ id: data.id })
+    const user = await this.userService.findOne({ where: { id: data.id } })
 
     return user
   }
@@ -107,7 +107,7 @@ export class AuthController {
       email
     })
 
-    return this.userService.findOne({ id })
+    return this.userService.findOne({ where: { id } })
   }
 
   @UseGuards(AuthGuard)
@@ -127,6 +127,6 @@ export class AuthController {
       password: await bcrypt.hash(password, 12)
     })
 
-    return this.userService.findOne({ id })
+    return this.userService.findOne({ where: { id } })
   }
 }

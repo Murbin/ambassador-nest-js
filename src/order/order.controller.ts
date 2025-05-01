@@ -8,7 +8,9 @@ export class OrderController {
 
     @Get('admin/orders')
     async all() {
-        return this.orderService.find({ relations: ['order_items'] })
+        return this.orderService.find({
+            relations: ['order_items']
+        });
     }
 
 

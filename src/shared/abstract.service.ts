@@ -1,4 +1,4 @@
-import { Repository, ObjectLiteral, DeepPartial } from "typeorm";
+import { Repository, ObjectLiteral, DeepPartial, FindOptionsWhere, FindOptionsRelations } from "typeorm";
 
 export abstract class AbstractService {
     protected constructor(
@@ -8,13 +8,20 @@ export abstract class AbstractService {
         return this.repository.save(options)
     }
 
-    async find(options: {} = {}) {
-        return this.repository.find({ where: options })
+    async find(options: { where?: any, relations?: string[] } = {}) {
+        return this.repository.find({
+            where: options.where || {},
+            relations: options.relations || []
+        });
     }
 
-    async findOne(options: {}) {
-        return this.repository.findOne({ where: options });
+    async findOne(options: { where?: any, relations?: string[] }) {
+        return this.repository.findOne({
+            where: options.where || {},
+            relations: options.relations || []
+        });
     }
+
     async update(id: number, options) {
         return this.repository.update(id, options as any)
     }

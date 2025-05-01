@@ -21,13 +21,13 @@ export class ProductController {
 
     @Get('admin/products/:id')
     async get(@Param('id') id: number) {
-        return this.productService.findOne({ id })
+        return this.productService.findOne({ where: { id } })
     }
 
     @Put('admin/products/:id')
     async update(@Param('id') id: number, @Body() body: ProductCreateDto) {
         await this.productService.update(id, body)
-        return this.productService.findOne({ id })
+        return this.productService.findOne({ where: { id } })
     }
 
     @Delete('admin/products/:id')

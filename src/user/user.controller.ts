@@ -9,7 +9,7 @@ export class UserController {
     @Get('admin/ambassadors')
     async ambassadors() {
         return this.userService.find({
-            is_ambassador: true
+            where: { is_ambassador: true }
         })
     }
 }   
