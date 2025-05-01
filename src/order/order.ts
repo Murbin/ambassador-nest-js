@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item";
+import { Exclude, Expose } from "class-transformer";
 
 @Entity('orders')
 export class Order {
@@ -18,9 +19,11 @@ export class Order {
     @Column()
     ambassador_email: string;
 
+    @Exclude()
     @Column()
     first_name: string;
 
+    @Exclude()
     @Column()
     last_name: string;
 
@@ -39,6 +42,7 @@ export class Order {
     @Column({ nullable: true })
     zip: string;
 
+    @Exclude()
     @Column({ nullable: false })
     complete: boolean;
 
@@ -52,4 +56,13 @@ export class Order {
     //     { id: 2, product_title: 'Pera', order_id: 1 },
     //     { id: 3, product_title: 'Uva', order_id: 1 }
     //   ]
+
+    @Expose()
+    get name() {
+        return this.first_name + ' ' + this.last_name;
+    }
+    @Expose()
+    get total() {
+        return this.order_items.reduce((sum, item) => sum + item.admin_revenue, 0)
+    }
 }
