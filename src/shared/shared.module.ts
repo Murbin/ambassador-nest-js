@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
+import { RedisService } from './redis.service';
 
 @Module({
     imports: [
@@ -30,6 +31,7 @@ import { redisStore } from 'cache-manager-redis-store';
             }),
         })
     ],
-    exports: [JwtModule, CacheModule]
+    providers: [RedisService, ConfigService],
+    exports: [JwtModule, CacheModule, RedisService]
 })
 export class SharedModule { }

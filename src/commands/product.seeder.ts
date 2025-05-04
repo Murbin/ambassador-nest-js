@@ -10,7 +10,6 @@ import { ProductService } from '../product/product.service';
     const app = await NestFactory.createApplicationContext(AppModule);
     const productService = app.get(ProductService);
 
-    const password = await bcrypt.hash('123', 12);
 
     for (let i = 0; i < 30; i++) {
         await productService.save({

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable, OneToMany } from "typeorm";
 import { User } from "../user/user";
 import { Product } from "../product/product";
-import { Order } from "src/order/order";
+import { Order } from "../order/order";
 
 @Entity('links')
 export class Link {

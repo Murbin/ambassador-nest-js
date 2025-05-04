@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Link } from './link';
-import { AbstractService } from 'src/shared/abstract.service';
+import { AbstractService } from '../shared/abstract.service';
 
 @Injectable()
 export class LinkService extends AbstractService {

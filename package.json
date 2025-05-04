@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:ambassador": "ts-node src/commands/ambassador.seeder.ts",
     "seed:product": "ts-node src/commands/product.seeder.ts",
-    "seed:order": "ts-node src/commands/order.seeder.ts"
+    "seed:order": "ts-node src/commands/order.seeder.ts",
+    "rankings": "ts-node src/commands/rankings.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^9.7.0",
