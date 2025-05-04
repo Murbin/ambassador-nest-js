@@ -15,4 +15,16 @@ export class UserController {
             where: { is_ambassador: true }
         })
     }
+
+    @Get('ambassador/rankings')
+    async rankings() {
+        const ambassadors = await this.userService.find({
+            where: { is_ambassador: true }, relations: ['orders', 'orders.order_items']
+        })
+
+        return ambassadors.map(ambassador => ({
+            name: ambassador.name,
+            revenue: ambassador.revenue
+        }))
+    }
 }   

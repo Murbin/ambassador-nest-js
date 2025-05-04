@@ -58,6 +58,7 @@ export class Order {
     link: Link;
 
     @ManyToOne(() => User, user => user.orders, { createForeignKeyConstraints: false })
+    @JoinColumn({ name: 'user_id' })
     user: User;
 
     //Lo que devolvera la relacion, como array de OrderItem en la propiedad nueva virtual order_items
