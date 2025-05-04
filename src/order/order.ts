@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item";
 import { Exclude, Expose } from "class-transformer";
+import { Link } from "src/link/link";
 
 @Entity('orders')
 export class Order {
@@ -49,6 +50,10 @@ export class Order {
     //@OneToMany(() => OrderItem,   indica cual es la entidad del otro lado de la relacion
     @OneToMany(() => OrderItem, orderItem => orderItem.order)
     order_items: OrderItem[];
+
+    @ManyToOne(() => Link, link => link.orders, { createForeignKeyConstraints: false })
+    @JoinColumn({ name: 'code', referencedColumnName: 'code' })
+    link: Link;
 
     //Lo que devolvera la relacion, como array de OrderItem en la propiedad nueva virtual order_items
     // [

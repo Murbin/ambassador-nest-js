@@ -8,6 +8,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductController } from './product/product.controller';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
+import { LinkModule } from './link/link.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { OrderModule } from './order/order.module';
     AuthModule,
     ProductModule,
     OrderModule,
+    LinkModule,
+    SharedModule,
   ],
   controllers: [AppController, ProductController],
   providers: [AppService],
