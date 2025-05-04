@@ -4,11 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './product';
 import { ProductController } from './product.controller';
 import { SharedModule } from '../shared/shared.module';
-@Module({
+import { CacheModule } from '@nestjs/cache-manager';
+import { ProductListener } from './listeners/product.listener';
 
-  imports: [TypeOrmModule.forFeature([Product]), SharedModule], //this will generate the product database table
-  providers: [ProductService],
+@Module({
+  imports: [TypeOrmModule.forFeature([Product]), SharedModule, CacheModule.register()], //this will generate the product database table
   controllers: [ProductController],
-  exports: [ProductService] // This is to be able to use the service in other modules
+  exports: [ProductService, CacheModule], // This is to be able to use the service in other modules
+  providers: [ProductService, ProductListener],
 })
 export class ProductModule { }
