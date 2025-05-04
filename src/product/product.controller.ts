@@ -65,7 +65,8 @@ export class ProductController {
     @Get('ambassador/products/frontend')
     async frontend(
         @Query('s') s: string,
-        @Query('sort') sort: string
+        @Query('sort') sort: string,
+        @Query('page') page: number = 1
     ) {
         let products = await this.productService.find()
 
@@ -79,7 +80,20 @@ export class ProductController {
             );
         }
 
-        return products
+        const perPage = 9
+        const startIndex = (page - 1) * perPage
+        const endIndex = page * perPage
+        const data = products.slice(startIndex, endIndex)
+        const total = products.length
+        const lastPage = Math.ceil(total / perPage)
+
+        return {
+            data,
+            total,
+            page,
+            lastPage
+
+        }
     }
 
 }
