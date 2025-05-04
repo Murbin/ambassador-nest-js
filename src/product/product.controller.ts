@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UseGuards, UseInterceptors, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductCreateDto } from './dtos/product-create.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CacheKey, CacheTTL, CacheInterceptor, Cache } from '@nestjs/cache-manager';
 import { Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Request } from 'express';
 
 @Controller('')
 export class ProductController {
@@ -62,8 +63,23 @@ export class ProductController {
     @CacheTTL(60 * 60)
     @UseInterceptors(CacheInterceptor)
     @Get('ambassador/products/frontend')
-    async frontend() {
-        return this.productService.find()
+    async frontend(
+        @Query('s') s: string,
+        @Query('sort') sort: string
+    ) {
+        let products = await this.productService.find()
+
+        if (s) {
+            products = products.filter(p => p.title.toLowerCase().includes(s.toLowerCase()) || p.description.toLowerCase().includes(s.toLowerCase()))
+        }
+
+        if (sort) {
+            products = products.sort((a, b) =>
+                sort === 'asc' ? a.price - b.price : b.price - a.price
+            );
+        }
+
+        return products
     }
 
 }
