@@ -13,8 +13,12 @@ export class AuthGuard implements CanActivate {
             if (!jwt) {
                 return false
             }
-            await this.jwtService.verifyAsync(jwt)
-            return true
+            const { scope } = await this.jwtService.verifyAsync(jwt)
+
+            const isAmbassador = request.path.toString().includes('api/ambassador')
+
+            return isAmbassador && scope === 'ambassador' || !isAmbassador && scope === 'admin'
+
         } catch (error) {
             return false
         }

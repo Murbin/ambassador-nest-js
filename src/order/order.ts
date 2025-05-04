@@ -1,7 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item";
 import { Exclude, Expose } from "class-transformer";
-import { Link } from "src/link/link";
+import { Link } from "../link/link";
+import { User } from "../user/user";
+import { N } from "@faker-js/faker/dist/airline-BUL6NtOJ";
 
 @Entity('orders')
 export class Order {
@@ -55,6 +57,9 @@ export class Order {
     @JoinColumn({ name: 'code', referencedColumnName: 'code' })
     link: Link;
 
+    @ManyToOne(() => User, user => user.orders, { createForeignKeyConstraints: false })
+    user: User;
+
     //Lo que devolvera la relacion, como array de OrderItem en la propiedad nueva virtual order_items
     // [
     //     { id: 1, product_title: 'Manzana', order_id: 1 },
@@ -66,8 +71,13 @@ export class Order {
     get name() {
         return this.first_name + ' ' + this.last_name;
     }
+
     @Expose()
-    get total() {
+    get total(): Number {
         return this.order_items.reduce((sum, item) => sum + item.admin_revenue, 0)
+    }
+
+    get ambassador_revenue(): number {
+        return this.order_items.reduce((sum, item) => sum + item.ambassador_revenue, 0)
     }
 }

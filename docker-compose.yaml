@@ -7,10 +7,12 @@ services:
       - .:/app:delegated
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     command: ["npm", "run", "start:dev"]
-
     depends_on:
       - db
+      - redis
     
   db:
     image: mysql:5.7.22
@@ -25,5 +27,14 @@ services:
     ports:
       - 33066:3306
 
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - redisdata:/data
+    command: redis-server --appendonly yes
+
 volumes:
   dbdata:
+  redisdata:
