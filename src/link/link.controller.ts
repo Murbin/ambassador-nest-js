@@ -28,4 +28,16 @@ export class LinkController {
             products: products.map(id => ({ id }))
         })
     }
+
+    @UseGuards(AuthGuard)
+    @Get('ambassador/stats')
+    async stats(@Req() req: Request & { cookies: { jwt: string } }) {
+        const user = await this.authService.user(req)
+        const links = await this.linkService.find({ where: { user }, relations: ['orders'] })
+        return links.map(link => ({
+            code: link.code,
+            count: link.orders.length,
+            revenue: link.orders.reduce((s, o) => s + o.ambassador_revenue, 0)
+        }))
+    }
 }
