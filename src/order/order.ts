@@ -75,7 +75,7 @@ export class Order {
 
     @Expose()
     get total(): Number {
-        return this.order_items.reduce((sum, item) => sum + item.admin_revenue, 0)
+        return this.order_items?.reduce((sum, item) => sum + item.admin_revenue, 0) || 0
     }
 
     get ambassador_revenue(): number {

@@ -1,8 +1,10 @@
-import { Controller, Param, Get, UseGuards, Post, Body, Req } from '@nestjs/common';
+import { Controller, Param, Get, UseGuards, Post, Body, Req, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { LinkService } from './link.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthService } from '../auth/auth.service';
+
 @Controller()
+@UseInterceptors(ClassSerializerInterceptor)
 export class LinkController {
     constructor(
         private linkService: LinkService,
@@ -40,4 +42,10 @@ export class LinkController {
             revenue: link.orders.reduce((s, o) => s + o.ambassador_revenue, 0)
         }))
     }
+
+    @Get('checkout/links/:code')
+    async checkout(@Param('code') code: string) {
+        return this.linkService.findOne({ where: { code }, relations: ['user', 'products'] })
+    }
+
 }
