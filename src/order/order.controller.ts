@@ -7,10 +7,11 @@ import { Order } from './order';
 import { OrderItem } from './order-item';
 import { Link } from '../link/link';
 import { ProductService } from 'src/product/product.service';
-import { OrderItemService } from './order-items.service';
 import { Connection } from 'typeorm';
 import { StripeService } from '../stripe/stripe.service';
 import Stripe from 'stripe';
+import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -19,9 +20,10 @@ export class OrderController {
         private orderService: OrderService,
         private linkService: LinkService,
         private productService: ProductService,
-        private orderItemService: OrderItemService,
+        private configService: ConfigService,
         private connection: Connection,
-        private stripeService: StripeService
+        private stripeService: StripeService,
+        private eventEmitter: EventEmitter2
     ) { }
 
     @UseGuards(AuthGuard)
@@ -96,8 +98,8 @@ export class OrderController {
                 payment_method_types: ['card'],
                 line_items,
                 mode: 'payment',
-                success_url: 'http://localhost:5000/success?source={CHECKOUT_SESSION_ID}',
-                cancel_url: 'http://localhost:5000/error',
+                success_url: this.configService.get('CHECKOUT_SUCCESS_URL') + '?source={CHECKOUT_SESSION_ID}',
+                cancel_url: this.configService.get('CHECKOUT_CANCEL_URL') + 'error',
             })
 
             await queryRunner.manager.update(Order, order.id, {
@@ -115,4 +117,29 @@ export class OrderController {
             await queryRunner.release()
         }
     }
-}   
+
+    @Post('checkout/orders/confirm')
+    async confirm(@Body('source') source: string) {
+        const order = await this.orderService.findOne({
+            where: {
+                transaction_id: source
+            },
+            relations: ['order_items']
+        })
+
+        if (!order) {
+            throw new BadGatewayException('Order not found')
+        }
+
+        await this.orderService.update(order.id, {
+            complete: true
+        })
+
+        this.eventEmitter.emit('order.completed', order)
+
+        return {
+            message: 'success'
+        }
+    }
+
+} 

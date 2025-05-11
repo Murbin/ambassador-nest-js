@@ -9,6 +9,7 @@ import { SharedModule } from '../shared/shared.module';
 import { LinkModule } from 'src/link/link.module';
 import { ProductModule } from 'src/product/product.module';
 import { StripeModule } from '../stripe/stripe.module';
+import { OrderListener } from './listeners/order.listener';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { StripeModule } from '../stripe/stripe.module';
     StripeModule
   ],
   controllers: [OrderController],
-  providers: [OrderService, OrderItemService]
+  providers: [OrderService, OrderItemService, OrderListener]
 })
 export class OrderModule { }
