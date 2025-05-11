@@ -10,6 +10,7 @@ import { LinkModule } from 'src/link/link.module';
 import { ProductModule } from 'src/product/product.module';
 import { StripeModule } from '../stripe/stripe.module';
 import { OrderListener } from './listeners/order.listener';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -17,7 +18,16 @@ import { OrderListener } from './listeners/order.listener';
     SharedModule,
     LinkModule,
     ProductModule,
-    StripeModule
+    StripeModule,
+    MailerModule.forRoot({
+      transport: {
+        host: 'host.docker.internal',
+        port: 1025,
+      },
+      defaults: {
+        from: 'no-reply@nest-ambassador.com'
+      }
+    }),
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderItemService, OrderListener]

@@ -9,10 +9,13 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
     command: ["npm", "run", "start:dev"]
     depends_on:
       - db
       - redis
+      - mailhog
     
   db:
     image: mysql:5.7.22
@@ -34,6 +37,12 @@ services:
     volumes:
       - redisdata:/data
     command: redis-server --appendonly yes
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   dbdata:
