@@ -12,4 +12,13 @@ export class UserService extends AbstractService {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
         super(userRepository)
     }
+
+    async paginateAmbassadors(page: number, limit: number): Promise<[User[], number]> {
+        const [data, total] = await this.userRepository.findAndCount({
+            where: { is_ambassador: true },
+            skip: (page - 1) * limit,
+            take: limit
+        });
+        return [data, total];
+    }
 }

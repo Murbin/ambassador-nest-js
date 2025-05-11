@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor, Controller, Get, UseGuards, UseInterceptors, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { RedisService } from '../shared/redis.service';
@@ -14,10 +14,15 @@ export class UserController {
 
     @UseGuards(AuthGuard)
     @Get('admin/ambassadors')
-    async ambassadors() {
-        return this.userService.find({
-            where: { is_ambassador: true }
-        })
+    async ambassadors(
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10
+    ) {
+        page = Number(page) || 1;
+        limit = Number(limit) || 10;
+        const [data, total] = await this.userService.paginateAmbassadors(page, limit);
+        const lastPage = Math.ceil(total / limit);
+        return { data, total, page, lastPage };
     }
 
     @Get('ambassador/rankings')
