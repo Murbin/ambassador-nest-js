@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Order } from "../order";
 import { OnEvent } from "@nestjs/event-emitter";
-import { RedisService } from "src/shared/redis.service";
+import { RedisService } from "../../shared/redis.service";
 
 
 @Injectable()
@@ -10,10 +10,9 @@ export class OrderListener {
 
     @OnEvent('order.completed')
     async handleOrderCompleted(order: Order) {
-        const orderItems = order.order_items
+        console.log('Listener ejecutado, orden:', order);
+        const client = await this.redisService.getClient();
 
-        const client = this.redisService.getClient()
-
-            ; (await client).zIncrBy('rankings', order.ambassador_revenue, order.user.name)
+        await client.zIncrBy('rankings', order.ambassador_revenue, order.user.name)
     }
 }

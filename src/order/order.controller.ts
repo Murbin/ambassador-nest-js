@@ -13,6 +13,7 @@ import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
+
 @Controller('')
 @UseInterceptors(ClassSerializerInterceptor)
 export class OrderController {
@@ -23,7 +24,7 @@ export class OrderController {
         private configService: ConfigService,
         private connection: Connection,
         private stripeService: StripeService,
-        private eventEmitter: EventEmitter2
+        private eventEmitter: EventEmitter2,
     ) { }
 
     @UseGuards(AuthGuard)
@@ -124,7 +125,7 @@ export class OrderController {
             where: {
                 transaction_id: source
             },
-            relations: ['order_items']
+            relations: ['order_items', 'user']
         })
 
         if (!order) {
@@ -135,11 +136,13 @@ export class OrderController {
             complete: true
         })
 
-        this.eventEmitter.emit('order.completed', order)
+        await this.eventEmitter.emit('order.completed', order)
 
         return {
             message: 'success'
         }
     }
+
+
 
 } 
