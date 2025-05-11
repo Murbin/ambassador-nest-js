@@ -9,6 +9,8 @@ import { Link } from '../link/link';
 import { ProductService } from 'src/product/product.service';
 import { OrderItemService } from './order-items.service';
 import { Connection } from 'typeorm';
+import { StripeService } from '../stripe/stripe.service';
+import Stripe from 'stripe';
 
 @Controller('')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -18,7 +20,8 @@ export class OrderController {
         private linkService: LinkService,
         private productService: ProductService,
         private orderItemService: OrderItemService,
-        private connection: Connection
+        private connection: Connection,
+        private stripeService: StripeService
     ) { }
 
     @UseGuards(AuthGuard)
@@ -43,7 +46,7 @@ export class OrderController {
             await queryRunner.connect()
             await queryRunner.startTransaction()
 
-            const o = new Order() // es una nueva instancia de la clase Order y se usa apra crear un nuevo registro en la base de datos
+            const o = new Order()
             o.user_id = link.user.id
             o.ambassador_email = link.user.email
             o.first_name = body.first_name
@@ -58,8 +61,7 @@ export class OrderController {
 
             const order = await queryRunner.manager.save(o)
 
-
-
+            const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
             for (const p of body.products) {
                 const product = await this.productService.findOne({ where: { id: p.product_id } })
@@ -75,19 +77,42 @@ export class OrderController {
                 orderItem.admin_revenue = 0.9 * product.price * p.quantity
 
                 await queryRunner.manager.save(orderItem)
+
+                line_items.push({
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: product.title,
+                            description: product.description,
+                            images: [product.image],
+                        },
+                        unit_amount: Math.round(product.price * 100),
+                    },
+                    quantity: p.quantity
+                })
             }
+
+            const session = await this.stripeService.createCheckoutSession({
+                payment_method_types: ['card'],
+                line_items,
+                mode: 'payment',
+                success_url: 'http://localhost:5000/success?source={CHECKOUT_SESSION_ID}',
+                cancel_url: 'http://localhost:5000/error',
+            })
+
+            await queryRunner.manager.update(Order, order.id, {
+                transaction_id: session.id
+            })
 
             await queryRunner.commitTransaction()
 
             return this.orderService.findOne({ where: { id: order.id }, relations: ['order_items'] })
 
-        } catch (error) {
+        } catch (e) {
             await queryRunner.rollbackTransaction()
             throw new BadGatewayException('Error creating order')
         } finally {
             await queryRunner.release()
         }
-
-
     }
 }   

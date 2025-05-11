@@ -8,9 +8,17 @@ import { OrderItemService } from './order-items.service';
 import { SharedModule } from '../shared/shared.module';
 import { LinkModule } from 'src/link/link.module';
 import { ProductModule } from 'src/product/product.module';
+import { StripeModule } from '../stripe/stripe.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, OrderItem]), SharedModule, LinkModule, ProductModule],
-  controllers: [OrderController], providers: [OrderService, OrderItemService]
+  imports: [
+    TypeOrmModule.forFeature([Order, OrderItem]),
+    SharedModule,
+    LinkModule,
+    ProductModule,
+    StripeModule
+  ],
+  controllers: [OrderController],
+  providers: [OrderService, OrderItemService]
 })
 export class OrderModule { }
