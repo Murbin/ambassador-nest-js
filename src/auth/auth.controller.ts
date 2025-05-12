@@ -88,7 +88,7 @@ export class AuthController {
     }
 
     const user = await this.userService.findOne({ where: { id: data.id }, relations: ['orders', 'orders.order_items'] })
-    console.log('user ===========>', user)
+
     const { orders, password, ...userData } = user
 
     return { ...userData, revenue: user.revenue }

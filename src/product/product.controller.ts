@@ -6,6 +6,7 @@ import { CacheKey, CacheTTL, CacheInterceptor, Cache } from '@nestjs/cache-manag
 import { Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Request } from 'express';
+import { CustomCacheInterceptor } from './interceptors/cache.interceptor';
 
 @Controller('')
 export class ProductController {
@@ -66,15 +67,14 @@ export class ProductController {
         return product
     }
 
-    @CacheKey('products_frontend')
-    @CacheTTL(60 * 60)
-    @UseInterceptors(CacheInterceptor)
+    @UseInterceptors(CustomCacheInterceptor)
     @Get('ambassador/products/frontend')
     async frontend(
         @Query('s') s: string,
         @Query('sort') sort: string,
         @Query('page') page: number = 1
     ) {
+        page = Number(page) || 1;
         let products = await this.productService.find()
 
         if (s) {
@@ -99,7 +99,6 @@ export class ProductController {
             total,
             page,
             lastPage
-
         }
     }
 
