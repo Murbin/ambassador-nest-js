@@ -17,8 +17,15 @@ export class ProductController {
 
     @UseGuards(AuthGuard)
     @Get('admin/products')
-    async all() {
-        return this.productService.find({})
+    async all(
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10
+    ) {
+        page = Number(page) || 1;
+        limit = Number(limit) || 10;
+        const [data, total] = await this.productService.paginate(page, limit);
+        const lastPage = Math.ceil(total / limit);
+        return { data, total, page, lastPage };
     }
 
     @UseGuards(AuthGuard)

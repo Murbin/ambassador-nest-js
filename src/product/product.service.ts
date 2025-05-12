@@ -11,4 +11,12 @@ export class ProductService extends AbstractService {
     ) {
         super(productRepository)
     }
+
+    async paginate(page: number, limit: number): Promise<[Product[], number]> {
+        const [data, total] = await this.productRepository.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit
+        });
+        return [data, total];
+    }
 }
